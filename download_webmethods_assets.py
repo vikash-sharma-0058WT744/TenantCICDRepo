@@ -37,6 +37,8 @@ def parse_arguments():
                         default=f'Update WebMethods assets {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}', 
                         help='Git commit message')
     parser.add_argument('--mock', action='store_true', help='Mock downloads for testing')
+    parser.add_argument('--ignore-empty-links', action='store_true', default=True, 
+                        help='Ignore assets with empty download links')
     return parser.parse_args()
 
 def load_json_data(json_file=None, json_string=None):
@@ -213,7 +215,7 @@ def git_operations(repo_path, files_to_add, branch_name, commit_message):
         logger.error(f"Git operation failed: {e}")
         return False
 
-def process_assets(json_data, output_dir, git_repo=None, git_branch='main', commit_message=None, mock=False):
+def process_assets(json_data, output_dir, git_repo=None, git_branch='main', commit_message=None, mock=False, ignore_empty_links=True):
     """Process assets from JSON data, download files and update Git repository."""
     if not json_data:
         logger.error("No valid JSON data to process")
@@ -223,6 +225,7 @@ def process_assets(json_data, output_dir, git_repo=None, git_branch='main', comm
     os.makedirs(output_dir, exist_ok=True)
     
     downloaded_files = []
+    has_valid_assets = False
     
     # Process each asset in the JSON response
     try:
@@ -250,8 +253,23 @@ def process_assets(json_data, output_dir, git_repo=None, git_branch='main', comm
                     break
             
             if not download_url:
-                logger.warning(f"No download link found in asset: {asset}")
-                continue
+                if ignore_empty_links:
+                    logger.warning(f"No download link found in asset: {asset} (ignoring)")
+                    continue
+                else:
+                    logger.warning(f"No download link found in asset: {asset}")
+                    continue
+            
+            # Skip empty download links
+            if not download_url.strip():
+                if ignore_empty_links:
+                    logger.warning(f"Empty download link in asset: {asset} (ignoring)")
+                    continue
+                else:
+                    logger.warning(f"Empty download link in asset: {asset}")
+                    continue
+            
+            has_valid_assets = True
             
             # Clean URL if needed (unescape HTML entities)
             download_url = html.unescape(download_url)
@@ -282,6 +300,11 @@ def process_assets(json_data, output_dir, git_repo=None, git_branch='main', comm
         logger.error(f"Error processing assets: {e}")
         return False
     
+    # If no valid assets were found, but we're ignoring empty links, consider this a success
+    if not has_valid_assets and ignore_empty_links:
+        logger.info("No valid assets with download links found, but ignoring empty links")
+        return True
+    
     # If Git repository is specified, push changes
     if git_repo and downloaded_files:
         if not commit_message:
@@ -305,7 +328,8 @@ def main():
         args.git_repo, 
         args.git_branch, 
         args.commit_message,
-        args.mock
+        args.mock,
+        args.ignore_empty_links
     )
     
     if success:
