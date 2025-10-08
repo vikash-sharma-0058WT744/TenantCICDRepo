@@ -33,10 +33,10 @@ repo_url = f"https://x-access-token:{token}@github.com/vikash-sharma-0058WT744/T
 
 
 # Set remote URL
-subprocess.run(["git", "remote", "set-url", "origin", repo_url], check=True)
+#subprocess.run(["git", "remote", "set-url", "origin", repo_url], check=True)
 
 # Push changes
-subprocess.run(["git", "push", "origin", "HEAD"], check=True)
+#subprocess.run(["git", "push", "origin", "HEAD"], check=True)
 
 
 logger = logging.getLogger('asset_downloader')
