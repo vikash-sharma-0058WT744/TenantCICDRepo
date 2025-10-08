@@ -38,14 +38,14 @@ jobs:
                 "type": "flow",
                 "description": "Example flow service",
                 "version": "1.0",
-                "downloadLink": "${{ secrets.WEBMETHODS_ASSET_URL1 }}"
+                "downloadLink": "${{ vars.WEBMETHODS_ASSET_URL1 }}"
               },
               {
                 "name": "FlowService2",
                 "type": "flow",
                 "description": "Another flow service",
                 "version": "1.1",
-                "downloadLink": "${{ secrets.WEBMETHODS_ASSET_URL2 }}"
+                "downloadLink": "${{ vars.WEBMETHODS_ASSET_URL2 }}"
               }
             ]
           }
