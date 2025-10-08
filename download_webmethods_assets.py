@@ -121,6 +121,15 @@ def git_operations(repo_path, files_to_add, branch_name, commit_message):
         if os.environ.get('GITHUB_ACTIONS') == 'true':
             logger.info("Running in GitHub Actions environment")
             
+
+            # Set remote URL using GH_PAT
+            token = os.getenv("GH_PAT")
+            if token:
+                repo_url = f"https://x-access-token:{token}@github.com/vikash-sharma-0058WT744/TenantCICDRepo.git"
+                subprocess.run(['git', 'remote', 'set-url', 'origin', repo_url], check=True)
+
+
+
             # Add files
             for file_path in files_to_add:
                 # Get relative path to repo
