@@ -114,6 +114,15 @@ def git_operations(repo_path, files_to_add, branch_name, commit_message):
                                    stdout=subprocess.PIPE, text=True)
             
             if result.stdout.strip():
+                # Ensure Git is configured
+                try:
+                    # Check if Git user is configured
+                    subprocess.run(['git', 'config', 'user.name'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                except subprocess.CalledProcessError:
+                    # Configure Git if not already configured
+                    subprocess.run(['git', 'config', 'user.name', 'GitHub Action'], check=True)
+                    subprocess.run(['git', 'config', 'user.email', 'action@github.com'], check=True)
+                
                 # Commit changes
                 subprocess.run(['git', 'commit', '-m', commit_message], check=True)
                 logger.info(f"Committed changes with message: {commit_message}")
@@ -163,6 +172,15 @@ def git_operations(repo_path, files_to_add, branch_name, commit_message):
                                            stdout=subprocess.PIPE, text=True)
                     
                     if result.stdout.strip():
+                        # Ensure Git is configured
+                        try:
+                            # Check if Git user is configured
+                            subprocess.run(['git', 'config', 'user.name'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        except subprocess.CalledProcessError:
+                            # Configure Git if not already configured
+                            subprocess.run(['git', 'config', 'user.name', 'GitHub Action'], check=True)
+                            subprocess.run(['git', 'config', 'user.email', 'action@github.com'], check=True)
+                        
                         # Commit changes
                         subprocess.run(['git', 'commit', '-m', commit_message], check=True)
                         logger.info(f"Committed changes with message: {commit_message}")
