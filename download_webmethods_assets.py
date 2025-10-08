@@ -25,6 +25,10 @@ logging.basicConfig(
 )
 
 token = os.getenv("GH_PAT")
+
+if not token:
+    raise EnvironmentError("GH_PAT not found in environment variables")
+
 repo_url = f"https://x-access-token:{token}@github.com/vikash-sharma-0058WT744/TenantCICDRepo.git"
 
 
