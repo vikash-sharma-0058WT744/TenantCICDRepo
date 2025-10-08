@@ -23,10 +23,23 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
-logger = logging.getLogger('asset_downloader')
 
-# Default target repository - can be overridden with environment variables
-DEFAULT_TARGET_REPO = "vikash-sharma-0058WT744/TenantCICDRepo"
+#token = os.getenv("GH_PAT")
+
+#if not token:
+    #raise EnvironmentError("GH_PAT not found in environment variables")
+
+#repo_url = f"https://x-access-token:{token}@github.com/vikash-sharma-0058WT744/TenantCICDRepo.git"
+
+
+# Set remote URL
+#subprocess.run(["git", "remote", "set-url", "origin", repo_url], check=True)
+
+# Push changes
+#subprocess.run(["git", "push", "origin", "HEAD"], check=True)
+
+
+logger = logging.getLogger('asset_downloader')
 
 def parse_arguments():
     """Parse command line arguments."""
@@ -42,7 +55,6 @@ def parse_arguments():
     parser.add_argument('--mock', action='store_true', help='Mock downloads for testing')
     parser.add_argument('--ignore-empty-links', action='store_true', default=True, 
                         help='Ignore assets with empty download links')
-    parser.add_argument('--target-repo', type=str, help='Target GitHub repository (username/repo)')
     return parser.parse_args()
 
 def load_json_data(json_file=None, json_string=None):
@@ -101,7 +113,7 @@ def download_file(url, output_path, mock=False):
         logger.error(f"Failed to download {url}: {e}")
         return False
 
-def git_operations(repo_path, files_to_add, branch_name, commit_message, target_repo=None):
+def git_operations(repo_path, files_to_add, branch_name, commit_message):
     """Add, commit and push files to Git repository."""
     try:
         # In GitHub Actions, we're already in the repository
@@ -109,21 +121,15 @@ def git_operations(repo_path, files_to_add, branch_name, commit_message, target_
         if os.environ.get('GITHUB_ACTIONS') == 'true':
             logger.info("Running in GitHub Actions environment")
             
-            # Get token from environment
-            token = os.getenv("GH_PAT")
-            if not token:
-                logger.error("GH_PAT environment variable not set")
-                return False
-            
-            # Determine target repository
-            if not target_repo:
-                target_repo = os.getenv("TARGET_REPO", DEFAULT_TARGET_REPO)
-            
+
             # Set remote URL using GH_PAT
-            repo_url = f"https://x-access-token:{token}@github.com/{target_repo}.git"
-            logger.info(f"Setting remote URL for repository: {target_repo}")
-            subprocess.run(['git', 'remote', 'set-url', 'origin', repo_url], check=True)
-            
+            token = os.getenv("GH_PAT")
+            if token:
+                repo_url = f"https://x-access-token:{token}@github.com/vikash-sharma-0058WT744/TenantCICDRepo.git"
+                subprocess.run(['git', 'remote', 'set-url', 'origin', repo_url], check=True)
+            else:
+                logger.warning("GH_PAT not found; using default remote URL")
+
             # Add files
             for file_path in files_to_add:
                 # Get relative path to repo
@@ -149,9 +155,9 @@ def git_operations(repo_path, files_to_add, branch_name, commit_message, target_
                 logger.info(f"Committed changes with message: {commit_message}")
                 
                 # Push to remote
-                logger.info(f"Pushing changes to branch: {branch_name}")
-                subprocess.run(['git', 'push', '-u', 'origin', branch_name], check=True)
-                logger.info(f"Successfully pushed changes to {target_repo}")
+                #subprocess.run(['git', 'push'], check=True)
+                subprocess.run(["git", "-C", repo_path, "push", "-u", "origin", "main"], check=True)
+                logger.info(f"Pushed changes to remote repository")
             else:
                 logger.info("No changes to commit")
                 
@@ -235,7 +241,7 @@ def git_operations(repo_path, files_to_add, branch_name, commit_message, target_
         logger.error(f"Git operation failed: {e}")
         return False
 
-def process_assets(json_data, output_dir, git_repo=None, git_branch='main', commit_message=None, mock=False, ignore_empty_links=True, target_repo=None):
+def process_assets(json_data, output_dir, git_repo=None, git_branch='main', commit_message=None, mock=False, ignore_empty_links=True):
     """Process assets from JSON data, download files and update Git repository."""
     if not json_data:
         logger.error("No valid JSON data to process")
@@ -330,7 +336,7 @@ def process_assets(json_data, output_dir, git_repo=None, git_branch='main', comm
         if not commit_message:
             commit_message = f"Added {len(downloaded_files)} assets on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
         
-        return git_operations(git_repo, downloaded_files, git_branch, commit_message, target_repo)
+        return git_operations(git_repo, downloaded_files, git_branch, commit_message)
     
     return len(downloaded_files) > 0
 
@@ -341,9 +347,6 @@ def main():
     # Load JSON data
     json_data = load_json_data(args.json_file, args.json_string)
     
-    # Get target repository from arguments or environment
-    target_repo = args.target_repo or os.getenv("TARGET_REPO")
-    
     # Process assets
     success = process_assets(
         json_data, 
@@ -352,8 +355,7 @@ def main():
         args.git_branch, 
         args.commit_message,
         args.mock,
-        args.ignore_empty_links,
-        target_repo
+        args.ignore_empty_links
     )
     
     if success:
