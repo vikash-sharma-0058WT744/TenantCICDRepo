@@ -1,0 +1,18 @@
+{
+  "assets": [
+    {
+      "name": "FlowService1",
+      "type": "flow",
+      "description": "Example flow service",
+      "version": "1.0",
+      "downloadLink": "https://example.com/api/v1/resources/export-flow1.zip/download?token=sample_token"
+    },
+    {
+      "name": "FlowService2",
+      "type": "flow",
+      "description": "Another flow service",
+      "version": "1.1",
+      "downloadLink": "https://example.com/api/v1/resources/export-flow2.zip/download?token=sample_token"
+    }
+  ]
+}
