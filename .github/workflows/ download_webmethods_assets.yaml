@@ -53,7 +53,7 @@ jobs:
       
       - name: Download webMethods.io assets
         env:
-          TOKEN: ${{ secrets.GH_PAT }}
+          GH_PAT: ${{ secrets.GH_PAT }}
 
         run: |
           python download_webmethods_assets.py \
