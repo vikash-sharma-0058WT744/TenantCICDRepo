@@ -63,7 +63,7 @@ jobs:
       
       - name: Commit and push changes
         run: |
-          git remote set-url origin https://x-access-token:${TOKEN}@github.com/vikash-sharma-0058WT744/TenantCICDRepo.git
+          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/vikash-sharma-0058WT744/TenantCICDRepo.git
           git add -A
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update webMethods.io assets [skip ci]" && git push)
 
