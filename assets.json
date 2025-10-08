@@ -5,14 +5,14 @@
       "type": "flow",
       "description": "Example flow service",
       "version": "1.0",
-      "downloadLink": "https://example.com/api/v1/resources/export-flow1.zip/download?token=sample_token"
+      "downloadLink": "https://test724810.a-vir-r1.int.ipaas.automation.ibm.com/apis/v1/rest/resources/export-fl9ab13f7e0aabe9bc714b5b-1759907867807.zip/download?token=21e58ece678cd89261f55eb053960d95&expires=1759908467809"
     },
     {
       "name": "FlowService2",
       "type": "flow",
       "description": "Another flow service",
       "version": "1.1",
-      "downloadLink": "https://example.com/api/v1/resources/export-flow2.zip/download?token=sample_token"
+      "downloadLink": "https://test724810.a-vir-r1.int.ipaas.automation.ibm.com/apis/v1/rest/resources/export-fl9ab13f7e0aabe9bc714b5b-1759907867807.zip/download?token=21e58ece678cd89261f55eb053960d95&expires=1759908467809"
     }
   ]
 }
