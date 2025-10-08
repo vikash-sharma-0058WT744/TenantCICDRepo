@@ -23,6 +23,18 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
+
+token = os.getenv("GH_PAT")
+repo_url = f"https://x-access-token:{token}@github.com/vikash-sharma-0058WT744/TenantCICDRepo.git"
+
+
+# Set remote URL
+subprocess.run(["git", "remote", "set-url", "origin", repo_url], check=True)
+
+# Push changes
+subprocess.run(["git", "push", "origin", "HEAD"], check=True)
+
+
 logger = logging.getLogger('asset_downloader')
 
 def parse_arguments():
