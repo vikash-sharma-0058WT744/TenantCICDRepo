@@ -155,7 +155,8 @@ def git_operations(repo_path, files_to_add, branch_name, commit_message):
                 logger.info(f"Committed changes with message: {commit_message}")
                 
                 # Push to remote
-                subprocess.run(['git', 'push'], check=True)
+                #subprocess.run(['git', 'push'], check=True)
+                subprocess.run(["git", "-C", repo_path, "push", "-u", "origin", "main"], check=True)
                 logger.info(f"Pushed changes to remote repository")
             else:
                 logger.info("No changes to commit")
