@@ -24,12 +24,12 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-token = os.getenv("GH_PAT")
+#token = os.getenv("GH_PAT")
 
-if not token:
-    raise EnvironmentError("GH_PAT not found in environment variables")
+#if not token:
+    #raise EnvironmentError("GH_PAT not found in environment variables")
 
-repo_url = f"https://x-access-token:{token}@github.com/vikash-sharma-0058WT744/TenantCICDRepo.git"
+#repo_url = f"https://x-access-token:{token}@github.com/vikash-sharma-0058WT744/TenantCICDRepo.git"
 
 
 # Set remote URL
@@ -127,8 +127,8 @@ def git_operations(repo_path, files_to_add, branch_name, commit_message):
             if token:
                 repo_url = f"https://x-access-token:{token}@github.com/vikash-sharma-0058WT744/TenantCICDRepo.git"
                 subprocess.run(['git', 'remote', 'set-url', 'origin', repo_url], check=True)
-
-
+            else:
+                logger.warning("GH_PAT not found; using default remote URL")
 
             # Add files
             for file_path in files_to_add:
