@@ -52,6 +52,9 @@ jobs:
           EOL
       
       - name: Download webMethods.io assets
+        env:
+          TOKEN: ${{ secrets.GH_PAT }}
+
         run: |
           python download_webmethods_assets.py \
             --json-file assets.json \
@@ -60,6 +63,7 @@ jobs:
       
       - name: Commit and push changes
         run: |
+          git remote set-url origin https://x-access-token:${TOKEN}@github.com/vikash-sharma-0058WT744/TenantCICDRepo.git
           git add -A
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update webMethods.io assets [skip ci]" && git push)
 
