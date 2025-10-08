@@ -26,16 +26,96 @@ You can do this using Git commands:
 git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
 cd YOUR_REPO_NAME
 
-# Copy the files
-cp /path/to/download_webmethods_assets.py .
+# Create necessary directories
 mkdir -p .github/workflows
-cp /path/to/download_webmethods_assets.yml .github/workflows/
-cp /path/to/requirements.txt .
-cp /path/to/README_webmethods_downloader.md .
+
+# Copy the files (make sure you're in the repository directory)
+# Note: These files should already be in your current directory
+cp download_webmethods_assets.py .
+cp .github/workflows/download_webmethods_assets.yml .github/workflows/
+cp requirements.txt .
+cp README_webmethods_downloader.md .
 
 # Commit and push
 git add .
 git commit -m "Add WebMethods asset downloader"
+git push
+```
+
+If you don't have the workflow file in your local directory, you can create it directly:
+
+```bash
+# Create the workflow file
+mkdir -p .github/workflows
+cat > .github/workflows/download_webmethods_assets.yml << 'EOL'
+name: Download webMethods.io Assets
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Run daily at midnight
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  download-assets:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+      
+      - name: Create assets JSON file
+        run: |
+          cat > assets.json << 'EOL'
+          {
+            "assets": [
+              {
+                "name": "FlowService1",
+                "type": "flow",
+                "description": "Example flow service",
+                "version": "1.0",
+                "downloadLink": "${{ secrets.WEBMETHODS_ASSET_URL1 }}"
+              },
+              {
+                "name": "FlowService2",
+                "type": "flow",
+                "description": "Another flow service",
+                "version": "1.1",
+                "downloadLink": "${{ secrets.WEBMETHODS_ASSET_URL2 }}"
+              }
+            ]
+          }
+          EOL
+      
+      - name: Download webMethods.io assets
+        run: |
+          python download_webmethods_assets.py \
+            --json-file assets.json \
+            --output-dir ./downloaded_assets \
+            --git-repo .
+      
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+      
+      - name: Commit and push changes
+        run: |
+          git add -A
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update webMethods.io assets [skip ci]" && git push)
+EOL
+
+git add .github/workflows/download_webmethods_assets.yml
+git commit -m "Add GitHub Actions workflow"
 git push
 ```
 
